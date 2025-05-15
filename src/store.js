@@ -2,7 +2,7 @@ export const initialStore = () => ({
   characters: [],
   planets: [],
   starShips:[],
-  favourites: [],
+  favorites: [],
   loading: false,
   error: null
 });
@@ -42,10 +42,10 @@ export default function storeReducer(store, action) {
         loading: false
       };
     
-    case 'SET_FAVOURITES':
+    case 'SET_FAVORITES':
       return{
         ...store,
-       favourites : action.payload,
+       favorites : action.payload,
        loading: false
       }
       

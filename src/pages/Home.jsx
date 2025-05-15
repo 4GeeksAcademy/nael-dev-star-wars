@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import {  CardPeople, CardPlanets, CardStarships } from "../components/Card.jsx";
+import { CardPeople, CardPlanets, CardStarships } from "../components/Card.jsx";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Home = () => {
 
-  
+
   const { store, dispatch } = useGlobalReducer();
 
   useEffect(() => {
@@ -20,7 +20,9 @@ export const Home = () => {
           first6.map(async (star) => {
             const starRes = await fetch(star.url);
             const starData = await starRes.json();
-          return {
+             console.log('starData.result.uid:', starData.result.uid);  // << aquí
+            return {
+              uid:  starData.result.uid,
               name: starData.result.properties.name,
               model: starData.result.properties.model,
               decription: starData.result.properties.starship_class
@@ -50,7 +52,9 @@ export const Home = () => {
           first6.map(async (char) => {
             const charRes = await fetch(char.url);
             const charData = await charRes.json();
+            console.log('charData.result.uid:', charData.result.uid);  // << aquí
             return {
+              uid: charData.result.uid,
               name: charData.result.properties.name,
               gender: charData.result.properties.gender,
               eyeColor: charData.result.properties.eye_color,
@@ -81,7 +85,9 @@ export const Home = () => {
           first6Planets.map(async (char) => {
             const plaRes = await fetch(char.url);
             const planData = await plaRes.json();
+             console.log('planData.result.uid:', planData.result.uid);  // << aquí
             return {
+              uid: planData.result.uid,
               name: planData.result.properties.name,
               population: planData.result.properties.population,
               terrain: planData.result.properties.terrain
@@ -97,81 +103,90 @@ export const Home = () => {
       }
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-     Promise.all([fetchCharacters(), fetchPlanets(), fetchStarships()])
+    Promise.all([fetchCharacters(), fetchPlanets(), fetchStarships()])
       .finally(() => {
         dispatch({ type: 'SET_LOADING', payload: false });
       });
   }, []);
 
-const handleAddFav =(item)=>{
-  const isFavAlredy = store.favourites.some(fav=>fav.name === item.name);
-  if(!isFavAlredy){
-    const newFav = [...store.favourites, item]
-    dispatch({type:'SET_FAVOURITES', payload:newFav})
+  const handleAddFav = (item) => {
+    const isFavAlredy = store.favorites.some(fav => fav.name === item.name);
+    if (!isFavAlredy) {
+      const newFav = [...store.favorites, item]
+      dispatch({ type: 'SET_FAVORITES', payload: newFav })
+    }
   }
-}
 
 
   if (store.loading) return <div>Cargando...</div>;
   if (store.error) return <div>Error: {store.error}</div>;
+  console.log('Store characters:', store.characters);
 
   return (
     <div>
-      <h2>6 Personajes de Star Wars</h2>
-      <div  className="card-group">
+      <h2> Personajes de Star Wars</h2>
+      <div className="card-group">
         {store.characters.map((character, index) => (
           <CardPeople key={index}
             nameTitle={character.name}
             gender={character.gender}
-            hairColor={character.eyeColor}
-            eyesColor={character.hairColor}
+            hairColor={character.hairColor}
+            eyesColor={character.eyeColor}
+            uid={character.uid}
             img={"https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/characters/1.jpg"}
-            addFavourites={()=>handleAddFav({
+            addFavorites={() => handleAddFav({
               type: 'people',
               ...character
             })}
-              isFavorite={store.favourites.some(fav => fav.id === character.id)}
-            />
+            isFavorite={store.favorites.some(fav => fav.name === character.name)}
+          />
 
         ))}
       </div>
-
-     <div className="card-group">
-        {store.planets.map((planet, index) => (
-          <CardPlanets key={index}
+      <div>
+        <h2> Planetas de Star Wars</h2>
+        <div className="card-group">
+          {store.planets.map((planet, index) => (
+            <CardPlanets
+               key={index}
               nameTitle={planet.name}
               population={planet.population}
               terrain={planet.terrain}
+              uid={planet.uid}
               img={"https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/planets/10.jpg"}
-              addFavourites={()=>handleAddFav({
-                typle: 'planet',
+              addFavorites={() => handleAddFav({
+                type: 'planet',
                 ...planet
               })}
-              isFavorite={store.favourites.some(fav => fav.id === planet.id)}
-          />
-           
+              isFavorite={store.favorites.some(fav => fav.name === planet.name)}
+            />
 
-          
-        ))}
-     </div>
 
-      <div className="card-group">
-        {store.starShips.map((nave, index) => (
-          <CardStarships key={index}
+
+          ))}
+        </div>
+      </div>
+      <div>
+        <h2> Planetas de Star Wars</h2>
+        <div className="card-group">
+          {store.starShips.map((nave, index) => (
+            <CardStarships key={index}
               nameTitle={nave.name}
               model={nave.model}
               description={nave.decription}
+              uid={nave.uid}
               img={"https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/starships/10.jpg"}
-              addFavourites={()=>handleAddFav({
+              addFavorites={() => handleAddFav({
                 type: 'starship',
                 ...nave
               })}
-               isFavorite={store.favourites.some(fav => fav.id === nave.id)}
-              />
-           
+              isFavorite={store.favorites.some(fav => fav.name === nave.name)}
+            />
 
-    
-        ))}
+
+
+          ))}
+        </div>
       </div>
     </div>
   );
