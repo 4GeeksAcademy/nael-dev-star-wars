@@ -3,191 +3,175 @@ import { CardPeople, CardPlanets, CardStarships } from "../components/Card.jsx";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Home = () => {
-
-
   const { store, dispatch } = useGlobalReducer();
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [localData, setLocalData] = useState({
+    characters: [],
+    planets:[],
+    starships:[]
+  })
 
   useEffect(() => {
-
-    const fetchStarships = async () => {
+    const fetchData = async () => {
       dispatch({ type: 'SET_LOADING', payload: true });
-      try {
-        const res = await fetch('https://www.swapi.tech/api/starships');
-        const data = await res.json();
-        const first6 = data.results.slice(0, 6);
-        // obtener lista detalla de naves
-        const starshipsData = await Promise.all(
-          first6.map(async (star) => {
-            const starRes = await fetch(star.url);
-            const starData = await starRes.json();
-             console.log('starData.result.uid:', starData.result.uid);  // << aquí
-            return {
-              uid:  starData.result.uid,
-              name: starData.result.properties.name,
-              model: starData.result.properties.model,
-              decription: starData.result.properties.starship_class
-            }
-          })
-
-        )
-        dispatch({ type: 'SET_STARSHIPS', payload: starshipsData });
-      } catch (error) {
-        dispatch({ type: 'SET_ERROR', payload: error.message });
+      
+      
+      
+      if (localData.characters.length > 0 &&
+        localData.planets.length > 0 &&
+        localData.starships.length > 0
+      ) {
+        setLocalData({
+          characters: store.characters,
+          planets: store.planets,
+          starships: store.starships
+        });
+        setInitialLoad(false);
+        return;
       }
 
-
-    }
-    const fetchCharacters = async () => {
-      dispatch({ type: 'SET_LOADING', payload: true });
-
+      
+       dispatch ({type:'SET_LOADING', payload: true});
 
       try {
-        // Obtener lista básica
-        const res = await fetch('https://www.swapi.tech/api/people');
-        const data = await res.json();
-        const first6 = data.results.slice(0, 6);
+        const [charactersRes, planetsRes, starshipsRes] = await Promise.all([
+          fetch('https://www.swapi.tech/api/people'),
+          fetch('https://www.swapi.tech/api/planets'),
+          fetch('https://www.swapi.tech/api/starships')
+        ]);
 
-        // Obtener detalles de cada personaje
-        const charactersData = await Promise.all(
-          first6.map(async (char) => {
-            const charRes = await fetch(char.url);
-            const charData = await charRes.json();
-            console.log('charData.result.uid:', charData.result.uid);  // << aquí
-            return {
-              uid: charData.result.uid,
-              name: charData.result.properties.name,
-              gender: charData.result.properties.gender,
-              eyeColor: charData.result.properties.eye_color,
-              hairColor: charData.result.properties.hair_color
-            };
-          })
-        );
-        dispatch({ type: 'SET_CHARACTERS', payload: charactersData });
+        const [charactersData, planetsData, starshipsData] = await Promise.all([
+          charactersRes.json(),
+          planetsRes.json(),
+          starshipsRes.json()
+        ]);
 
+        const [characters, planets, starships] = await Promise.all([
+          fetchDetails(charactersData.results.slice(0, 6)),
+          fetchDetails(planetsData.results.slice(0, 6)),
+          fetchDetails(starshipsData.results.slice(0, 6))
+        ]);
 
-
+        dispatch({
+          type: 'SET_ALL_DATA',
+          payload: { characters, planets, starships }
+        });
+       
       } catch (error) {
         dispatch({ type: 'SET_ERROR', payload: error.message });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+        setInitialLoad(false);
       }
-
     };
 
-    const fetchPlanets = async () => {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      try {
-        const respPlanets = await fetch('https://www.swapi.tech/api/planets');
-        const dataPlanets = await respPlanets.json();
-        const first6Planets = dataPlanets.results.slice(0, 6);
+    const fetchDetails = async (items) => {
+      return Promise.all(
+        items.map(async (item) => {
+          const res = await fetch(item.url);
+          const data = await res.json();
+          return {
+            uid: data.result.uid,
+            ...data.result.properties
+          };
+        })
+      );
+    };
 
-
-        //Obtener detalle de los planetas 
-        const planetsData = await Promise.all(
-          first6Planets.map(async (char) => {
-            const plaRes = await fetch(char.url);
-            const planData = await plaRes.json();
-             console.log('planData.result.uid:', planData.result.uid);  // << aquí
-            return {
-              uid: planData.result.uid,
-              name: planData.result.properties.name,
-              population: planData.result.properties.population,
-              terrain: planData.result.properties.terrain
-            }
-          })
-        )
-
-
-
-        dispatch({ type: 'SET_PLANETS', payload: planetsData });
-      } catch (error) {
-        dispatch({ type: 'SET_ERROR', payload: error.message });
-      }
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
-    Promise.all([fetchCharacters(), fetchPlanets(), fetchStarships()])
-      .finally(() => {
-        dispatch({ type: 'SET_LOADING', payload: false });
-      });
+    fetchData();
   }, []);
 
   const handleAddFav = (item) => {
-    const isFavAlredy = store.favorites.some(fav => fav.name === item.name);
-    if (!isFavAlredy) {
-      const newFav = [...store.favorites, item]
-      dispatch({ type: 'SET_FAVORITES', payload: newFav })
+    const isFavAlready = store.favorites.some(fav => fav.name === item.name);
+    if (!isFavAlready) {
+      dispatch({ 
+        type: 'SET_FAVORITES', 
+        payload: [...store.favorites, item] 
+      });
     }
+  };
+
+  if (store.loading && initialLoad) return (
+    <div className="text-center">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  );
+
+  if (store.error) return <div className="alert alert-danger">Error: {store.error}</div>;
+
+  const localDataUse = {
+    characters: localData.characters.length > 0 ? localData.characters : store.characters,
+    planets: localData.planets.length > 0 ? localData.planets : store.planets,
+    starships: localData.starships.length > 0 ? localData.starships : store.starships
   }
-
-
-  if (store.loading) return <div>Cargando...</div>;
-  if (store.error) return <div>Error: {store.error}</div>;
-  console.log('Store characters:', store.characters);
 
   return (
     <div>
-      <h2> Personajes de Star Wars</h2>
-      <div className="card-group">
-        {store.characters.map((character, index) => (
-          <CardPeople key={index}
-            nameTitle={character.name}
-            gender={character.gender}
-            hairColor={character.hairColor}
-            eyesColor={character.eyeColor}
-            uid={character.uid}
-            img={"https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/characters/1.jpg"}
-            addFavorites={() => handleAddFav({
-              type: 'people',
-              ...character
-            })}
-            isFavorite={store.favorites.some(fav => fav.name === character.name)}
-          />
-
-        ))}
-      </div>
-      <div>
-        <h2> Planetas de Star Wars</h2>
+      <section>
+        <h2>Personajes de Star Wars</h2>
         <div className="card-group">
-          {store.planets.map((planet, index) => (
+          {localDataUse.characters?.map((character) => (
+            <CardPeople
+              key={character.uid}
+              nameTitle={character.name}
+              gender={character.gender}
+              hairColor={character.hair_color}
+              eyesColor={character.eye_color}
+              uid={character.uid}
+              img={`https://starwars-visualguide.com/assets/img/characters/${character.uid}.jpg`}
+              addFavorites={() => handleAddFav({
+                type: 'people',
+                ...character
+              })}
+              isFavorite={store.favorites.some(fav => fav.name === character.name)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-4">
+        <h2>Planetas de Star Wars</h2>
+        <div className="card-group">
+          {localDataUse.planets?.map((planet) => (
             <CardPlanets
-               key={index}
+              key={planet.uid}
               nameTitle={planet.name}
               population={planet.population}
               terrain={planet.terrain}
               uid={planet.uid}
-              img={"https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/planets/10.jpg"}
+              img={`https://starwars-visualguide.com/assets/img/planets/${planet.uid}.jpg`}
               addFavorites={() => handleAddFav({
                 type: 'planet',
                 ...planet
               })}
               isFavorite={store.favorites.some(fav => fav.name === planet.name)}
             />
-
-
-
           ))}
         </div>
-      </div>
-      <div>
-        <h2> Planetas de Star Wars</h2>
+      </section>
+
+      <section className="mt-4">
+        <h2>Naves Estelares</h2>
         <div className="card-group">
-          {store.starShips.map((nave, index) => (
-            <CardStarships key={index}
-              nameTitle={nave.name}
-              model={nave.model}
-              description={nave.decription}
-              uid={nave.uid}
-              img={"https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/starships/10.jpg"}
+          {localDataUse.starships?.map((ship) => (
+            <CardStarships
+              key={ship.uid}
+              nameTitle={ship.name}
+              model={ship.model}
+              description={ship.starship_class}
+              uid={ship.uid}
+              img={`https://starwars-visualguide.com/assets/img/starships/${ship.uid}.jpg`}
               addFavorites={() => handleAddFav({
                 type: 'starship',
-                ...nave
+                ...ship
               })}
-              isFavorite={store.favorites.some(fav => fav.name === nave.name)}
+              isFavorite={store.favorites.some(fav => fav.name === ship.name)}
             />
-
-
-
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

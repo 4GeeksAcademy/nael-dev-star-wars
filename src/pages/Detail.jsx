@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { DetailsCard } from "../components/DetailsCard";
+import { DetailsCardPeople, DetailsCardPlanet, DetailsStarship } from "../components/DetailsCard";
 
 export const Detail = () => {
   const { type, uid } = useParams(); 
@@ -15,15 +15,7 @@ export const Detail = () => {
         const data = await res.json();
         const props = data.result.properties;
         setItem({
-          uid,
-          name: props.name,
-          gender: props.gender,
-          eyeColor: props.eye_color,
-          hairColor: props.hair_color,
-          population: props.population,
-          terrain: props.terrain,
-          model: props.model,
-          decription: props.starship_class
+          datas : props
         });
       } catch (err) {
         setError("No se pudo cargar el detalle.");
@@ -36,13 +28,29 @@ export const Detail = () => {
     fetchDetail();
   }, [type, uid]);
 
+  const switchType = () =>{
+    switch (type) {
+      case 'people':
+        return <DetailsCardPeople item={item.datas} type={type} />;
+      case 'planets':
+        return <DetailsCardPlanet item={item.datas} type={type} />
+      case 'starships':
+        return <DetailsStarship item={item.datas} type={type} />
+
+      default:
+        return <div>Tipo no identificado</div>
+
+
+    }
+  }
+
   if (loading) return <div>Cargando detalle...</div>;
   if (error) return <div>{error}</div>;
   if (!item) return <div>No se encontró el ítem.</div>;
 
   return (
-    <div className="container mt-4">
-      <DetailsCard item={item} />
+    <div className="d-flex justify-content-center mt-4">
+      {switchType()}
     </div>
   );
-};
+};  

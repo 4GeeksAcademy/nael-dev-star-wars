@@ -48,6 +48,15 @@ export default function storeReducer(store, action) {
        favorites : action.payload,
        loading: false
       }
+        case 'SET_ALL_DATA':
+      return {
+        ...store,
+        characters: action.payload.characters || [],
+        planets: action.payload.planets || [],
+        starShips: action.payload.starShips || [], 
+        loading: false,
+        error: null
+      };
       
 
     default:

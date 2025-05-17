@@ -2,75 +2,72 @@
 import useGlobalReducer from "../hooks/useGlobalReducer"
 
 
-export const DetailsCard = ({item}) => {
-    const {store} = useGlobalReducer();
-   
-    
+export const DetailsCardPeople = ({ item,img }) => {
+
     return (
-        <div className="container">
-        <div >
-            <div >
-                <h1>{item.name}</h1>
-            </div>
-            <div className="p-2">
-                <p>{item.description}</p>
-                
-                <h2 >BIRTH YEAR</h2>
-                <ul className="list-unstyled">
-                    <li>{item.birth_year}</li>
-                    
-                </ul>
-                
-                <div className="row">
-                    <div className="col-md-6">
-                        <h2 >Affiliations</h2>
-                        <ul>
-                            <li>Rebel Alliance</li>
-                            <li>Jedi Order</li>
-                        </ul>
-                        
-                        <h2>Locations</h2>
-                        <ul>
-                            <li>Polis Massa</li>
-                            <li>Lars Moisture Farm</li>
-                            <li>Tatooine</li>
-                        </ul>
-                    </div>
-                    
-                    <div className="col-md-6">
-                        <h2>Details</h2>
-                        <ul className="list-unstyled">
-                            <li><strong>Gender:</strong> Male</li>
-                            <li><strong>Height:</strong> 1.72m</li>
-                            <li><strong>Species:</strong> Human</li>
-                        </ul>
-                    </div>
+        <div className="card" style={{width: "18rem"}}>
+            <img className="card-img-top" src={img} alt="Card image cap"/>
+                <div className="card-body">
+                    <h1 className="card-title">{item.name}</h1>
+                    <h3>Height:{item.height}</h3>
+                    <h3>Mass:{item.mass}</h3>
+                    <h3>Hair Color: {item.hair_color}</h3>
+                    <h3>Eye Color: {item.eye_color}</h3>
+                    <h3>Birth year: {item.birth_year}</h3>
+                    <h3>Gender: {item.gender}</h3>
+                    <h3>Naves: {item.starships}</h3>
+
                 </div>
-                
-                <h2 >Vehicles</h2>
-                <ul>
-                    <li>T-16 Skyhopper</li>
-                    <li>X-34 Landspeeder</li>
-                    <li>X-wing Starfighter</li>
-                    <li>Snowspeeder</li>
-                </ul>
-                
-                <h2 >Weapons</h2>
-                <ul>
-                    <li>Lightsaber</li>
-                    <li>Blaster Pistol</li>
-                    <li>Luke Skywalker's Lightsaber (Green Blade)</li>
-                    <li>Anakin, Luke, and Rey's Lightsaber</li>
-                </ul>
-                
-                <h2>Tools</h2>
-                <ul>
-                    <li>Bacta Tank</li>
-                    <li>Moisture Vaporator</li>
-                </ul>
-            </div>
         </div>
-    </div>
+
+    )
+}
+
+export const DetailsCardPlanet = ({ item,img }) => {
+
+    return (
+        <div className="card" style={{width: "18rem"}}>
+            <img className="card-img-top" src={img} alt="Card image cap"/>
+                <div className="card-body">
+                    <h1 className="card-title">{item.name}</h1>
+                    <h3>Height:{item.rotation_period}</h3>
+                    <h3>Mass:{item.orbital_period}</h3>
+                    <h3>Hair Color: {item.diameter}</h3>
+                    <h3>Eye Color: {item.climate}</h3>
+                    <h3>Birth year: {item.gravity}</h3>
+                    <h3>Gender: {item.terrain}</h3>
+                    <h3>Naves: {item.surface_water}</h3>
+                    <h3>Naves: {item.population}</h3>
+
+                </div>
+        </div>
+
+    )
+}
+
+export const DetailsStarship = ({ item,img }) => {
+
+    return (
+        <div className="card">
+            <img className="card-img-top" src={img} alt="Card image cap"/>
+                <div className="card-body">
+                    <h1 className="card-title">{item.name}</h1>
+                    <h3>Height:{item.manufacturer}</h3>
+                    <h3>Mass:{item.cost_in_credits}</h3>
+                    <h3>Hair Color: {item.length}</h3>
+                    <h3>Eye Color: {item.max_atmosphering_speed}</h3>
+                    <h3>Birth year: {item.crew}</h3>
+                    <h3>Gender: {item.passengers}</h3>
+                    <h3>Naves: {item.cargo_capacity}</h3>
+                    <h3>Naves: {item.consumables}</h3>
+                    <h3>Naves: {item.hyperdrive_rating}</h3>
+                    <h3>Naves: {item.MGLT}</h3>
+                    <h3>Naves: {item.starship_class}</h3>
+                    
+                    
+
+                </div>
+        </div>
 
     )
 }
