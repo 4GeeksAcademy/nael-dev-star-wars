@@ -28,7 +28,6 @@ export const Detail = () => {
     fetchDetail();
   }, [type, uid]);
 
-  console.log("este es la id",uid)
 
   const switchType = () =>{
     switch (type) {

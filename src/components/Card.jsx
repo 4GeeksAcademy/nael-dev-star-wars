@@ -5,7 +5,7 @@ import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 
 export const CardPeople =({uid,nameTitle,img,addFavorites, isFavorite})=>{
     return (
-        <div className="card" style={{ width: "100%" }}>
+        <div className="card">
             <img src={img} className="card-img-top" alt="..." />
             <div className="card-body">
                 <h3 className="card-title">{nameTitle}</h3>
@@ -25,7 +25,7 @@ export const CardPeople =({uid,nameTitle,img,addFavorites, isFavorite})=>{
 }
 export const CardPlanets =({uid,nameTitle ,img,addFavorites,isFavorite})=>{
     return (
-        <div className="card" style={{width: "100%"}}>
+        <div className="card">
             <img src={img} className="card-img-top" alt="..." />
             <div className="card-body">
                 <h3 className="card-title">{nameTitle}</h3>
@@ -44,7 +44,7 @@ export const CardPlanets =({uid,nameTitle ,img,addFavorites,isFavorite})=>{
 }
 export const CardStarships =({uid,nameTitle,img,addFavorites, isFavorite})=>{
     return (
-        <div className="card" style={{width: "100%"}}>
+        <div className="card">
             <img src={img} className="card-img-top" alt="..." />
             <div className="card-body">
                 <h3 className="card-title">{nameTitle}</h3>

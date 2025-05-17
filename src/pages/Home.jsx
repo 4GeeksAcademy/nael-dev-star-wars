@@ -52,11 +52,14 @@ export const Home = () => {
           starshipsRes.json()
         ]);
 
-        const [characters, planets, starships] = await Promise.all([
-          fetchDetails(charactersData.results.slice(0, 10)),
-          fetchDetails(planetsData.results.slice(0, 10)),
-          fetchDetails(starshipsData.results.slice(0, 10))
-        ]);
+         const formatItems = (data) =>
+          data.results.map((item) => ({
+            uid: item.uid,   
+            name: item.name
+          }));
+       const characters = formatItems(charactersData);
+        const planets = formatItems(planetsData);
+        const starships = formatItems(starshipsData);
 
         dispatch({
           type: 'SET_ALL_DATA',
@@ -76,28 +79,24 @@ export const Home = () => {
       }
     };
 
-    const fetchDetails = async (items) => {
-      return Promise.all(
-        items.map(async (item) => {
-          const res = await fetch(item.url);
-          const data = await res.json();
-          return {
-            uid: data.result.uid,
-            ...data.result.properties
-          };
-        })
-      );
-    };
+   
 
     fetchData();
   }, []);
 
+  const myTypeToApi = {
+  character: "people",
+  planet: "planets",
+  starship: "starships"
+};
+
   const handleAddFav = (item) => {
-    const isFavAlready = store.favorites.some(fav => fav.name === item.name);
+    const valorsApi = myTypeToApi[item.type]
+    const isFavAlready = store.favorites.some(fav => fav.uid === item.id);
     if (!isFavAlready) {
       dispatch({
         type: 'SET_FAVORITES',
-        payload: [...store.favorites, item]
+        payload: [...store.favorites,{...item, type: valorsApi}]
       });
     }
   };
@@ -125,15 +124,15 @@ export const Home = () => {
   return (
     
      <div className="container mt-4">
-      {/* Personajes */}
+   
       <h2 className="text-center mb-4">Personajes de Star Wars</h2>
-      <Carousel id="charactersCarousel" stack={characterStack} CardComponent={CardPeople} type="people" handleAddFav={handleAddFav} favorites={store.favorites} />
+      <Carousel id="charactersCarousel" stack={characterStack} CardComponent={CardPeople} type="character" handleAddFav={handleAddFav} favorites={store.favorites} />
 
-      {/* Planetas */}
+    
       <h2 className="text-center mb-4">Planetas de Star Wars</h2>
       <Carousel id="planetsCarousel" stack={planetStack} CardComponent={CardPlanets} type="planet" handleAddFav={handleAddFav} favorites={store.favorites} />
 
-      {/* Naves */}
+   
       <h2 className="text-center mb-4">Naves de Star Wars</h2>
       <Carousel id="starshipsCarousel" stack={starshipStack} CardComponent={CardStarships} type="starship" handleAddFav={handleAddFav} favorites={store.favorites} />
     </div>

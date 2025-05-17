@@ -1,16 +1,22 @@
-.cards-wrapper {
-  display: flex;
-  justify-content: center;
+body{
+  background-image: url('https://lumiere-a.akamaihd.net/v1/images/star-wars-backgrounds-14_856985d9.jpeg?download=true');
+  background-size: cover;        /* Cubre todo el espacio disponible */
+  background-position: center;   /* Centra la imagen */
+  background-attachment: fixed;  /* Fondo fijo al hacer scroll (opcional) */
+  background-repeat: no-repeat; /* Evita que se repita */
+  min-height: 100vh;            /* Altura mínima = 100% del viewport */
+  padding: 2rem;                /* Espaciado interno para que el contenido no quede pegado a los bordes */
+  color: white; 
 }
 .card img {
   max-width: 100%;
   max-height: 100%;
+  object-fit: cover;
 }
 .card {
-  margin: 0 0.5em;
-  box-shadow: 2px 6px 8px 0 rgba(22, 22, 26, 0.18);
-  border: none;
-  border-radius: 0;
+  margin: 0 0.75em;    
+  min-width: 250px;     
+  flex: 1 1 auto;       
 }
 .carousel-inner {
   padding: 1em;
@@ -24,8 +30,115 @@
   top: 50%;
   transform: translateY(-50%);
 }
-@media (min-width: 768px) {
-  .card img {
-    height: 11em;
+.card-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 1em;                               
+}
+@media (max-width: 768px) {
+  .card-group {
+    grid-template-columns: repeat(2, 1fr); /* 2 tarjetas en tablets */
+  }
+}
+
+@media (max-width: 576px) {
+  .card-group {
+    grid-template-columns: 1fr; /* 1 tarjeta en móviles */
+  }
+}
+
+.detail-card {
+  max-width: 900px; /* Aumentamos el ancho máximo */
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.detail-card-img-container {
+  height: 400px; /* Aumentamos la altura de la imagen */
+  overflow: hidden;
+}
+
+.detail-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.detail-card-body {
+  padding: 2rem; /* Más espacio interno */
+}
+
+.detail-card-title {
+  font-size: 2.5rem; /* Título más grande */
+  margin-bottom: 1.5rem;
+  color: #222;
+  font-weight: bold;
+  border-bottom: 3px solid #f0f0f0;
+  padding-bottom: 1rem;
+}
+
+.detail-card-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Columnas más anchas */
+  gap: 1.5rem; /* Más espacio entre elementos */
+}
+
+.detail-card-info h3 {
+  font-size: 1.4rem; /* Texto más grande */
+  margin: 0.8rem 0;
+  color: #444;
+  line-height: 1.5;
+}
+
+.detail-card-info strong {
+  color: #000;
+  font-weight: 600;
+}
+
+/* Responsive para tablets */
+@media (max-width: 992px) {
+  .detail-card {
+    max-width: 95%;
+  }
+  
+  .detail-card-img-container {
+    height: 350px;
+  }
+  
+  .detail-card-title {
+    font-size: 2.2rem;
+  }
+  
+  .detail-card-info h3 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .detail-card-img-container {
+    height: 300px;
+  }
+  
+  .detail-card-body {
+    padding: 1.5rem;
+  }
+  
+  .detail-card-title {
+    font-size: 2rem;
+  }
+  
+  .detail-card-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-card-info h3 {
+    font-size: 1.2rem;
   }
 }
