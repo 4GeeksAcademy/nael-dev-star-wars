@@ -28,14 +28,16 @@ export const Detail = () => {
     fetchDetail();
   }, [type, uid]);
 
+  console.log("este es la id",uid)
+
   const switchType = () =>{
     switch (type) {
       case 'people':
-        return <DetailsCardPeople item={item.datas} type={type} />;
+        return <DetailsCardPeople item={item.datas} type={type} img={`https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/characters/${uid}.jpg`} />;
       case 'planets':
-        return <DetailsCardPlanet item={item.datas} type={type} />
+        return <DetailsCardPlanet item={item.datas} type={type} img={`https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/planets/${uid}.jpg`}/>
       case 'starships':
-        return <DetailsStarship item={item.datas} type={type} />
+        return <DetailsStarship item={item.datas} type={type}  img={`https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/starships/${uid}.jpg`}/>
 
       default:
         return <div>Tipo no identificado</div>

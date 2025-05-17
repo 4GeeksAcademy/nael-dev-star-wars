@@ -7,16 +7,24 @@ export const Home = () => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [localData, setLocalData] = useState({
     characters: [],
-    planets:[],
-    starships:[]
+    planets: [],
+    starships: []
   })
+
+  const divideFourCarousel =(array,size) =>{
+    const result= [];
+    for(let i=0 ;i<array.length; i += size){
+      result.push(array.slice(i, i + size));
+    }
+    return result;
+  }
 
   useEffect(() => {
     const fetchData = async () => {
-      dispatch({ type: 'SET_LOADING', payload: true });
       
-      
-      
+
+
+
       if (localData.characters.length > 0 &&
         localData.planets.length > 0 &&
         localData.starships.length > 0
@@ -30,9 +38,7 @@ export const Home = () => {
         return;
       }
 
-      
-       dispatch ({type:'SET_LOADING', payload: true});
-
+      dispatch({ type: 'SET_LOADING', payload: true });
       try {
         const [charactersRes, planetsRes, starshipsRes] = await Promise.all([
           fetch('https://www.swapi.tech/api/people'),
@@ -47,16 +53,21 @@ export const Home = () => {
         ]);
 
         const [characters, planets, starships] = await Promise.all([
-          fetchDetails(charactersData.results.slice(0, 6)),
-          fetchDetails(planetsData.results.slice(0, 6)),
-          fetchDetails(starshipsData.results.slice(0, 6))
+          fetchDetails(charactersData.results.slice(0, 10)),
+          fetchDetails(planetsData.results.slice(0, 10)),
+          fetchDetails(starshipsData.results.slice(0, 10))
         ]);
 
         dispatch({
           type: 'SET_ALL_DATA',
           payload: { characters, planets, starships }
         });
-       
+        setLocalData({
+          characters,
+          planets,
+          starships
+        });
+
       } catch (error) {
         dispatch({ type: 'SET_ERROR', payload: error.message });
       } finally {
@@ -84,9 +95,9 @@ export const Home = () => {
   const handleAddFav = (item) => {
     const isFavAlready = store.favorites.some(fav => fav.name === item.name);
     if (!isFavAlready) {
-      dispatch({ 
-        type: 'SET_FAVORITES', 
-        payload: [...store.favorites, item] 
+      dispatch({
+        type: 'SET_FAVORITES',
+        payload: [...store.favorites, item]
       });
     }
   };
@@ -107,71 +118,55 @@ export const Home = () => {
     starships: localData.starships.length > 0 ? localData.starships : store.starships
   }
 
+   const characterStack = divideFourCarousel(localDataUse.characters, 4);
+  const planetStack = divideFourCarousel(localDataUse.planets, 4);
+  const starshipStack = divideFourCarousel(localDataUse.starships, 4);
+
   return (
-    <div>
-      <section>
-        <h2>Personajes de Star Wars</h2>
-        <div className="card-group">
-          {localDataUse.characters?.map((character) => (
-            <CardPeople
-              key={character.uid}
-              nameTitle={character.name}
-              gender={character.gender}
-              hairColor={character.hair_color}
-              eyesColor={character.eye_color}
-              uid={character.uid}
-              img={`https://starwars-visualguide.com/assets/img/characters/${character.uid}.jpg`}
-              addFavorites={() => handleAddFav({
-                type: 'people',
-                ...character
-              })}
-              isFavorite={store.favorites.some(fav => fav.name === character.name)}
-            />
-          ))}
-        </div>
-      </section>
+    
+     <div className="container mt-4">
+      {/* Personajes */}
+      <h2 className="text-center mb-4">Personajes de Star Wars</h2>
+      <Carousel id="charactersCarousel" stack={characterStack} CardComponent={CardPeople} type="people" handleAddFav={handleAddFav} favorites={store.favorites} />
 
-      <section className="mt-4">
-        <h2>Planetas de Star Wars</h2>
-        <div className="card-group">
-          {localDataUse.planets?.map((planet) => (
-            <CardPlanets
-              key={planet.uid}
-              nameTitle={planet.name}
-              population={planet.population}
-              terrain={planet.terrain}
-              uid={planet.uid}
-              img={`https://starwars-visualguide.com/assets/img/planets/${planet.uid}.jpg`}
-              addFavorites={() => handleAddFav({
-                type: 'planet',
-                ...planet
-              })}
-              isFavorite={store.favorites.some(fav => fav.name === planet.name)}
-            />
-          ))}
-        </div>
-      </section>
+      {/* Planetas */}
+      <h2 className="text-center mb-4">Planetas de Star Wars</h2>
+      <Carousel id="planetsCarousel" stack={planetStack} CardComponent={CardPlanets} type="planet" handleAddFav={handleAddFav} favorites={store.favorites} />
 
-      <section className="mt-4">
-        <h2>Naves Estelares</h2>
-        <div className="card-group">
-          {localDataUse.starships?.map((ship) => (
-            <CardStarships
-              key={ship.uid}
-              nameTitle={ship.name}
-              model={ship.model}
-              description={ship.starship_class}
-              uid={ship.uid}
-              img={`https://starwars-visualguide.com/assets/img/starships/${ship.uid}.jpg`}
-              addFavorites={() => handleAddFav({
-                type: 'starship',
-                ...ship
-              })}
-              isFavorite={store.favorites.some(fav => fav.name === ship.name)}
-            />
-          ))}
-        </div>
-      </section>
+      {/* Naves */}
+      <h2 className="text-center mb-4">Naves de Star Wars</h2>
+      <Carousel id="starshipsCarousel" stack={starshipStack} CardComponent={CardStarships} type="starship" handleAddFav={handleAddFav} favorites={store.favorites} />
     </div>
   );
 };
+
+const Carousel = ({ id, stack, CardComponent, type, handleAddFav, favorites }) => (
+  <div id={id} className="carousel slide mb-5" data-bs-ride="carousel">
+    <div className="carousel-inner">
+      {stack.map((group, index) => (
+        <div className={`carousel-item ${index === 0 ? 'active' : ''}`} key={`${id}-${index}`}>
+          <div className="card-group">
+            {group.map((item) => (
+              <CardComponent
+                key={item.uid}
+                uid={item.uid}
+                nameTitle={item.name}
+                img={`https://raw.githubusercontent.com/tbone849/star-wars-guide/refs/heads/master/build/assets/img/${type}s/${item.uid}.jpg`}
+                addFavorites={() => handleAddFav({ type, ...item })}
+                isFavorite={favorites.some(fav => fav.name === item.name)}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+    <button className="carousel-control-prev" type="button" data-bs-target={`#${id}`} data-bs-slide="prev">
+      <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span className="visually-hidden">Previous</span>
+    </button>
+    <button className="carousel-control-next" type="button" data-bs-target={`#${id}`} data-bs-slide="next">
+      <span className="carousel-control-next-icon" aria-hidden="true"></span>
+      <span className="visually-hidden">Next</span>
+    </button>
+  </div>
+);

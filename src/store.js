@@ -1,7 +1,7 @@
 export const initialStore = () => ({
   characters: [],
   planets: [],
-  starShips:[],
+  starships:[],
   favorites: [],
   loading: false,
   error: null
@@ -25,7 +25,7 @@ export default function storeReducer(store, action) {
         case 'SET_STARSHIPS':
         return {
           ...store,
-          starShips :action.payload,
+          starships :action.payload,
           loading: false
         }
 
@@ -53,7 +53,7 @@ export default function storeReducer(store, action) {
         ...store,
         characters: action.payload.characters || [],
         planets: action.payload.planets || [],
-        starShips: action.payload.starShips || [], 
+        starships: action.payload.starships || [], 
         loading: false,
         error: null
       };
